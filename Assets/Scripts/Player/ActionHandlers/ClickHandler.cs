@@ -15,6 +15,7 @@ namespace Player.ActionHandlers
         public event Action<Vector3> PointerUpEvent;
         public event Action<Vector3> DragStartEvent;
         public event Action<Vector3> DragEndEvent;
+        public event Action<float> ScrollEvent;
 
         private Vector3 _pointerDownPosition;
 
@@ -25,21 +26,27 @@ namespace Player.ActionHandlers
 
         private void Update()
         {
+            float scroll = Input.mouseScrollDelta.y;
+            if (scroll != 0.0f)
+            {
+                ScrollEvent?.Invoke(scroll);
+            }
+
             if (Input.GetMouseButtonDown(0))
             {
                 _isClick = true;
                 _clickHoldDuration = .0f;
 
                 _pointerDownPosition = CameraHolder.Instance.MainCamera.ScreenToWorldPoint(Input.mousePosition);
-                
+
                 PointerDownEvent?.Invoke(_pointerDownPosition);
-                
+
                 _pointerDownPosition = new Vector3(_pointerDownPosition.x, _pointerDownPosition.y, .0f);
             }
             else if (Input.GetMouseButtonUp(0))
             {
                 var pointerUpPosition = CameraHolder.Instance.MainCamera.ScreenToWorldPoint(Input.mousePosition);
-                    
+
                 if (_isDrag)
                 {
                     DragEndEvent?.Invoke(pointerUpPosition);
@@ -50,7 +57,7 @@ namespace Player.ActionHandlers
                 {
                     ClickEvent?.Invoke(pointerUpPosition);
                 }
-                
+
                 PointerUpEvent?.Invoke(pointerUpPosition);
 
                 _isClick = false;
@@ -72,18 +79,26 @@ namespace Player.ActionHandlers
             }
         }
 
-        public void SetDragEventHandlers(Action<Vector3> dragStartEvent, Action<Vector3> dragEndEvent)
+        public void SubscribeDragEventHandlers(Action<Vector3> dragStartEvent, Action<Vector3> dragEndEvent)
         {
-            ClearEvents();
-
-            DragStartEvent = dragStartEvent;
-            DragEndEvent = dragEndEvent;
+            DragStartEvent += dragStartEvent;
+            DragEndEvent += dragEndEvent;
         }
 
-        public void ClearEvents()
+        public void UnsubscribeDragEventHandlers(Action<Vector3> dragStartEvent, Action<Vector3> dragEndEvent)
         {
-            DragStartEvent = null;
-            DragEndEvent = null;
+            DragStartEvent -= dragStartEvent;
+            DragEndEvent -= dragEndEvent;
+        }
+
+        public void SubscribeScrollHandlers(Action<float> scrollEvent)
+        {
+            ScrollEvent += scrollEvent;
+        }
+
+        public void UnsubscribeScrollHandlers(Action<float> scrollEvent)
+        {
+            ScrollEvent -= scrollEvent;
         }
     }
 }
