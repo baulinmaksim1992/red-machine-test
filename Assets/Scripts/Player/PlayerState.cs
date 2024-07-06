@@ -5,5 +5,6 @@ namespace Player
         None = 0,
         Scrolling = 1,
         Connecting = 2,
+        CameraMoving = 3,
     }
 }

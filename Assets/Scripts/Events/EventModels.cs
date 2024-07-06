@@ -20,6 +20,16 @@ namespace Events
             {
                 
             }
+
+            public struct CameraMoveStarted : IEvent
+            {
+                
+            }
+
+            public struct ScrollStarted : IEvent
+            {
+                
+            }
         }
     }
 }
